@@ -311,14 +311,14 @@ MonoBehaviour:
   LongitudinalSpeed: 0.0006
   verticalSpeed: 0.0004
   mouseMoevementSpeed: 0.2
-  fovChangeSpeed: 0.0008
+  fovChangeSpeed: 0.03
   ShiftMultiplyer: 4
   InvertedY: 0
   verticalFilter: 0.003
   lateralFilter: 0.005
   LongitudinalFilter: 0.005
   mouseFilter: 0.04
-  fovFilter: 0.0001
+  fovFilter: 0.01
 --- !u!1001 &1708835442
 PrefabInstance:
   m_ObjectHideFlags: 0
