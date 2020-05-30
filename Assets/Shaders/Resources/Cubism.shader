@@ -39,11 +39,11 @@
 #define tiling        0.2
 #define seedMaxOffset 1.0
 #define lineThickness 1.3
-			float rand(float seed) {
+			inline float rand(float seed) {
 				return frac(sin(seed*51.24) * 417.26);
 			}
 
-			float3 sgmentIDtoColor(float3 segmentID) {
+			inline float3 sgmentIDtoColor(float3 segmentID) {
 
 				return float3(rand(dot(segmentID, float3(12.26, 712.1, 7.215))),
 					rand(dot(segmentID, float3(362.26, 81.16, 2.2))), 
@@ -53,8 +53,15 @@
 
 
 			
-			
 
+			inline float4x4 AdjustViewMatrix(float4x4 ViewMatrix, float3 segmentSeed) {
+				float4x4 toreturn = { ViewMatrix[0][0], ViewMatrix[0][1], ViewMatrix[0][2], ViewMatrix[0][3] + segmentSeed.x,
+									  ViewMatrix[1][0], ViewMatrix[1][1], ViewMatrix[1][2], ViewMatrix[1][3] + segmentSeed.y,
+									  ViewMatrix[2][0], ViewMatrix[2][1], ViewMatrix[2][2], ViewMatrix[2][3] + segmentSeed.z,
+									  ViewMatrix[3][0], ViewMatrix[3][1], ViewMatrix[3][2], ViewMatrix[3][3]   };
+				return toreturn;
+
+			}
 
             v2f vert (appdata v)
             {
@@ -89,9 +96,8 @@
 				}
 
 
-				vPosT = mul(UNITY_MATRIX_V,      vPosT);
+				vPosT = mul(AdjustViewMatrix(UNITY_MATRIX_V, sgmentIDtoColor(closestSeed)),      vPosT);
 
-				vPosT.xyz += sgmentIDtoColor(closestSeed);
 				vPosT = mul(UNITY_MATRIX_P,      vPosT);
 
 				o.screenpos = ComputeScreenPos(vPosT);
