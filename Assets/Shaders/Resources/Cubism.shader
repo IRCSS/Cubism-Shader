@@ -2,7 +2,12 @@
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
+        _MainTex         ("Texture", 2D) = "white" {}
+	    _VoronoiTiling   ("Voronoi Tiling", Float) = 1
+        _SeedMaxOffset   ("Voronoi max Offset", Range(0., 2.)) = 1.
+        _Seed            ("Starting Seed", Int ) = 0
+	    _RotationStren   ("Cubism Rotation Strenght", Float ) = 1
+		_DispacementStren("Cubism Displacement Strenght", Float) = 1
     }
     SubShader
     {
@@ -35,13 +40,14 @@
             sampler2D _MainTex;
             float4    _MainTex_ST;
 
+			float _VoronoiTiling;
+			float _SeedMaxOffset;
+			float _RotationStren;
+			int   _Seed;
+			float _DispacementStren;
 
-#define tiling        0.2
-#define seedMaxOffset 1.0
-#define lineThickness 1.3
-#define cubsimStren   0.5 * sin(_Time)
 			inline float rand(float seed) {
-				return frac(sin(seed*51.24) * 417.26);
+				return frac(sin((seed+ _Seed )*51.24) * 417.26);
 			}
 
 			inline float3 sgmentIDtoColor(float3 segmentID) {
@@ -58,10 +64,10 @@
 			inline float4x4 AdjustViewMatrixToCubism(float4x4 ViewMatrix, float3 segmentSeed) {
 
 				float3   camPosition = ViewMatrix._m03_m13_m23;
-				float3   randSeed    = sgmentIDtoColor(segmentSeed) * (0.5 * sin(_Time.y + dot(segmentSeed.xyz, float3(5.2,0.215,7.721))) +0.6)*0.5;
+				float3   randSeed    = sgmentIDtoColor(segmentSeed) *_DispacementStren /**(0.5 * sin(_Time.y + dot(segmentSeed.xyz, float3(5.2, 0.215, 7.721))) + 0.6)*0.5*/;
 					     
 				float3   segmentOnZ  = max(4.,abs(dot(ViewMatrix._m02_m12_m22, segmentSeed - camPosition )))
-					* ViewMatrix._m02_m12_m22 + camPosition;
+					* ViewMatrix._m02_m12_m22/ _RotationStren + camPosition;
 
 				         camPosition = camPosition + randSeed;
 
@@ -84,8 +90,8 @@
 				       vPosT = mul(unity_ObjectToWorld, vPosT);
 
 
-				float3 vPosF = frac(vPosT*tiling);
-				float3 vPosI = floor(vPosT*tiling);
+				float3 vPosF = frac(vPosT*_VoronoiTiling);
+				float3 vPosI = floor(vPosT*_VoronoiTiling);
 
 
 				float  closestDis   = 10000.;
@@ -95,7 +101,7 @@
 						for (int z = -1; z <= 1; z++) {
 
 							float3 neighbourPos  = float3(float(x), float(y), float(z));
-							float3 randSeed      = sgmentIDtoColor(vPosI + neighbourPos) * seedMaxOffset;
+							float3 randSeed      = sgmentIDtoColor(vPosI + neighbourPos) * _SeedMaxOffset;
 							
 							float3 vToNeighbour  = randSeed + neighbourPos - vPosF;
 							float  vToNeighbourD = length(vToNeighbour);
