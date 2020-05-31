@@ -39,6 +39,7 @@
 #define tiling        0.2
 #define seedMaxOffset 1.0
 #define lineThickness 1.3
+#define cubsimStren   0.5 * sin(_Time)
 			inline float rand(float seed) {
 				return frac(sin(seed*51.24) * 417.26);
 			}
@@ -54,11 +55,23 @@
 
 			
 
-			inline float4x4 AdjustViewMatrix(float4x4 ViewMatrix, float3 segmentSeed) {
-				float4x4 toreturn = { ViewMatrix[0][0], ViewMatrix[0][1], ViewMatrix[0][2], ViewMatrix[0][3] + segmentSeed.x,
-									  ViewMatrix[1][0], ViewMatrix[1][1], ViewMatrix[1][2], ViewMatrix[1][3] + segmentSeed.y,
-									  ViewMatrix[2][0], ViewMatrix[2][1], ViewMatrix[2][2], ViewMatrix[2][3] + segmentSeed.z,
-									  ViewMatrix[3][0], ViewMatrix[3][1], ViewMatrix[3][2], ViewMatrix[3][3]   };
+			inline float4x4 AdjustViewMatrixToCubism(float4x4 ViewMatrix, float3 segmentSeed) {
+
+				float3   camPosition = ViewMatrix._m03_m13_m23;
+				float3   randSeed    = sgmentIDtoColor(segmentSeed) * (0.5 * sin(_Time.y + dot(segmentSeed.xyz, float3(5.2,0.215,7.721))) +0.6)*0.5;
+					     
+				float3   segmentOnZ  = max(4.,abs(dot(ViewMatrix._m02_m12_m22, segmentSeed - camPosition )))
+					* ViewMatrix._m02_m12_m22 + camPosition;
+
+				         camPosition = camPosition + randSeed;
+
+				float3   foward      = normalize(segmentOnZ - camPosition);
+				float3   right       = -cross(ViewMatrix._m01_m11_m21, foward );
+				float3   up          = -cross(foward, right);
+				float4x4 toreturn    = { right.x,   up.x,   foward.x, camPosition.x,
+									     right.y,   up.y,   foward.y, camPosition.y,
+									     right.z,   up.z,   foward.z, camPosition.z,
+									          0.,     0.,         0.,            1.};
 				return toreturn;
 
 			}
@@ -89,14 +102,16 @@
 
 							if (vToNeighbourD <= closestDis) {
 								closestDis   = vToNeighbourD;
-								closestSeed  = neighbourPos + vPosI;
+								closestSeed  = neighbourPos + vPosI + randSeed;
 							}
 						}
 					}
 				}
 
 
-				vPosT = mul(AdjustViewMatrix(UNITY_MATRIX_V, sgmentIDtoColor(closestSeed)),      vPosT);
+				vPosT = mul(AdjustViewMatrixToCubism(UNITY_MATRIX_V, closestSeed),      vPosT);
+				//vPosT = mul(UNITY_MATRIX_V, vPosT);
+				//vPosT.xyz += sgmentIDtoColor(closestSeed);
 
 				vPosT = mul(UNITY_MATRIX_P,      vPosT);
 
