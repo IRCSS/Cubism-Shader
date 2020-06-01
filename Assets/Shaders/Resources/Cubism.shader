@@ -64,13 +64,18 @@
 			inline float4x4 AdjustViewMatrixToCubism(float4x4 ViewMatrix, float3 segmentSeed) {
 
 				float3   camPosition = ViewMatrix._m03_m13_m23;
-				float3   randSeed    = sgmentIDtoColor(segmentSeed) *_DispacementStren /**(0.5 * sin(_Time.y + dot(segmentSeed.xyz, float3(5.2, 0.215, 7.721))) + 0.6)*0.5*/;
+				float3   randSeed    = sgmentIDtoColor(segmentSeed) *_DispacementStren;
 					     
+				// Project the center of the closet seed on the forward of the camera and calculate its postion
+				// The rotationStrengh moves this point along the foward of the camera back and foward as a 
+				// Balencing parameter
 				float3   segmentOnZ  = max(4.,abs(dot(ViewMatrix._m02_m12_m22, segmentSeed - camPosition )))
 					* ViewMatrix._m02_m12_m22/ _RotationStren + camPosition;
 
 				         camPosition = camPosition + randSeed;
 
+						 // Point the camera so that it is facing this point which was 
+						 // Projected above.
 				float3   foward      = normalize(segmentOnZ - camPosition);
 				float3   right       = -cross(ViewMatrix._m01_m11_m21, foward );
 				float3   up          = -cross(foward, right);
