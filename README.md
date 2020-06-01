@@ -5,7 +5,7 @@ In the repo you will find code for achieving a cubist like effect on meshes. The
 
 More info on it in this blog post: https://medium.com/@shahriyarshahrabi/real-time-cubism-shader-5c8e0c79195c
 
-The mesh is not in the repo, you can grab it on [sketchfab](https://skfb.ly/6xySP). Mesh is from The Hallwyl Museum.
+The mesh is not in the repo, you can grab it on [sketchfab](https://skfb.ly/6xySP).The mesh used for show case the shade is from The Hallwyl Museum, scanned by ErikLernestal.
  
 
 ![screenshot](https://s7.gifyu.com/images/cubsimreadme.gif)
